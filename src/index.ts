@@ -4,9 +4,9 @@ const DOCKER_AUTH = 'https://auth.docker.io/token';
 
 const app = new Hono();
 app.get('/v2/*', async (c) => {
-  const path = (c.req.param('*') || '').replace(/^\/+/, ''); // 去掉开头的斜杠
+  const path = new URL(c.req.url).pathname;
   console.log('Proxying path:', path);
-  const url = `${DOCKER_REGISTRY}/v2/${path}`;
+  const url = `${DOCKER_REGISTRY}${path}`;
   console.log('Target URL:', url);
   let res = await fetch(url, {
     method: 'GET'
