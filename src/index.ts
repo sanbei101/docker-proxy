@@ -8,15 +8,13 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 // 工具函数:将裸镜像名(如 nginx)重写为 library/nginx
 function rewritePath(path: string): string {
-  // 匹配 /v2/<name>/... 且 <name> 不包含 '/'
-  const match = path.match(/^\/v2\/([^/]+)\/(.*)$/);
-  if (match) {
-    const [_, name, rest] = match;
-    if (!name.includes('/')) {
-      return `/v2/library/${name}/${rest}`;
-    }
-  }
-  return path;
+  if (path.startsWith('/v2/library/')) return path;
+
+  const parts = path.split('/');
+  if (parts.length !== 5) return path;
+  if (parts[3] !== 'manifests' && parts[3] !== 'blobs') return path;
+
+  return `/v2/library/${parts[2]}/${parts[3]}/${parts[4]}`;
 }
 app.get('/v2/*', async (c) => {
   const path = new URL(c.req.url).pathname;

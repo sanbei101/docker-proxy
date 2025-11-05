@@ -9,7 +9,5 @@
       "ESNext",
       "DOM"
     ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
   },
 }
