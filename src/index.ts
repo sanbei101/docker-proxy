@@ -1,12 +1,28 @@
 import { Hono } from 'hono';
 const DOCKER_REGISTRY = 'https://registry-1.docker.io';
 const DOCKER_AUTH = 'https://auth.docker.io/token';
-
-const app = new Hono();
+type Bindings = {
+  DOCKER_USERNAME: string;
+  DOCKER_TOKEN: string;
+};
+const app = new Hono<{ Bindings: Bindings }>();
+// 工具函数:将裸镜像名(如 nginx)重写为 library/nginx
+function rewritePath(path: string): string {
+  // 匹配 /v2/<name>/... 且 <name> 不包含 '/'
+  const match = path.match(/^\/v2\/([^/]+)\/(.*)$/);
+  if (match) {
+    const [_, name, rest] = match;
+    if (!name.includes('/')) {
+      return `/v2/library/${name}/${rest}`;
+    }
+  }
+  return path;
+}
 app.get('/v2/*', async (c) => {
   const path = new URL(c.req.url).pathname;
-  console.log('Proxying path:', path);
-  const url = `${DOCKER_REGISTRY}${path}`;
+  const rewrittenPath = rewritePath(path);
+  console.log(`origin path: ${path} -> rewrite path: ${rewrittenPath}`);
+  const url = `${DOCKER_REGISTRY}${rewrittenPath}`;
   console.log('Target URL:', url);
   let res = await fetch(url, {
     method: 'GET'
@@ -32,8 +48,14 @@ app.get('/v2/*', async (c) => {
       scope: scope
     });
 
+    const authHeader = 'Basic ' + btoa(`${c.env.DOCKER_USERNAME}:${c.env.DOCKER_TOKEN}`);
     const tokenUrl = `${DOCKER_AUTH}?${queryParams.toString()}`;
-    const tokenRes = await fetch(tokenUrl);
+    console.log('token url:', tokenUrl);
+    const tokenRes = await fetch(tokenUrl, {
+      headers: {
+        Authorization: authHeader
+      }
+    });
 
     if (!tokenRes.ok) {
       return new Response('Auth failed', { status: tokenRes.status });
@@ -49,7 +71,8 @@ app.get('/v2/*', async (c) => {
   }
   return new Response(res.body, {
     status: res.status,
-    statusText: res.statusText
+    statusText: res.statusText,
+    headers: res.headers
   });
 });
 app.get('/', (c) => {
