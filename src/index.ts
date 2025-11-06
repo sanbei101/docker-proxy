@@ -34,59 +34,49 @@ export const REGISTRY_CONFIG = new Map<string, RegistryConfig>([
   ]
 ]);
 const app = new Hono<{ Bindings: Bindings }>();
+const KNOWN_REGISTRIES = new Set(['ghcr.io', 'gcr.io', 'quay.io', 'registry-1.docker.io', 'docker.io']);
+
 export function ParsePath(path: string): ParsePathResult | null {
   if (!path.startsWith('/v2/')) return null;
 
-  const parts = path.split('/').filter((p) => p !== '');
+  const parts = path.split('/').filter(Boolean); //去除第一个''
   if (parts.length < 4 || parts[0] !== 'v2') return null;
 
   const operationIndex = parts.length - 2;
   const operation = parts[operationIndex];
   if (operation !== 'manifests' && operation !== 'blobs') return null;
 
-  const reference = parts[parts.length - 1]; // tag or digest
-
-  // 已知 registry 列表
-  const knownRegistries = new Set(['ghcr.io', 'gcr.io', 'quay.io', 'registry-1.docker.io', 'docker.io']);
+  const reference = parts[parts.length - 1];
 
   const firstSegment = parts[1];
+  let registryKey: string;
+  let repoStartIndex: number;
 
-  // 情况 1: 路径以已知 registry 开头
-  if (knownRegistries.has(firstSegment)) {
-    let registryKey = firstSegment;
-    if (registryKey === 'docker.io') {
-      registryKey = 'registry-1.docker.io'; // 统一用 registry-1.docker.io 作为 key
-    }
-
-    const config = REGISTRY_CONFIG.get(registryKey);
-    if (!config) return null;
-
-    const repoParts = parts.slice(2, operationIndex);
-    const repository = repoParts.join('/');
-
-    return {
-      registry: registryKey,
-      repository,
-      operation: operation,
-      reference,
-      registryConfig: config
-    };
+  if (KNOWN_REGISTRIES.has(firstSegment)) {
+    // 标准化 docker.io → registry-1.docker.io
+    registryKey = firstSegment === 'docker.io' ? 'registry-1.docker.io' : firstSegment;
+    repoStartIndex = 2;
+  } else {
+    // 默认为 Docker Hub
+    registryKey = 'registry-1.docker.io';
+    repoStartIndex = 1;
   }
 
-  // 情况 2: 默认是 Docker Hub(无 registry 前缀)
-  const config = REGISTRY_CONFIG.get('registry-1.docker.io');
+  const config = REGISTRY_CONFIG.get(registryKey);
   if (!config) return null;
 
-  const repoParts = parts.slice(1, operationIndex);
-  let repository = repoParts.join('/');
-  if (repoParts.length === 1) {
-    repository = `library/${repository}`;
+  const repoParts = parts.slice(repoStartIndex, operationIndex);
+  let repository: string;
+  if (registryKey === 'registry-1.docker.io' && repoParts.length === 1) {
+    repository = `library/${repoParts[0]}`;
+  } else {
+    repository = repoParts.join('/');
   }
 
   return {
-    registry: 'registry-1.docker.io',
+    registry: registryKey,
     repository,
-    operation: operation,
+    operation,
     reference,
     registryConfig: config
   };
