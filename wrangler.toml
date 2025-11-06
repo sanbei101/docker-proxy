@@ -1,0 +1,14 @@
+name = "docker-proxy"
+main = "src/index.ts"
+compatibility_date = "2025-11-05"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1

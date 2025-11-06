@@ -7,7 +7,7 @@ type Bindings = {
 };
 const app = new Hono<{ Bindings: Bindings }>();
 // 工具函数:将裸镜像名(如 nginx)重写为 library/nginx
-function rewritePath(path: string): string {
+export function rewritePath(path: string): string {
   if (path.startsWith('/v2/library/')) return path;
 
   const parts = path.split('/');
