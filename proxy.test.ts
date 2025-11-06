@@ -1,43 +1,76 @@
 import { expect, test } from 'vitest';
-import { rewritePath } from './src/index';
-type Case = {
-  input: string;
-  expected: string;
-};
-const cases: Case[] = [
-  {
-    input: '/v2/library/nginx/manifests/latest',
-    expected: '/v2/library/nginx/manifests/latest'
-  },
+import { REGISTRY_CONFIG, type ParsePathResult, ParsePath } from './src/index';
+
+const parseCases: { input: string; expected: ParsePathResult }[] = [
+  // ===== DockerHub:裸镜像 =====
   {
     input: '/v2/nginx/manifests/latest',
-    expected: '/v2/library/nginx/manifests/latest'
+    expected: {
+      registry: 'registry-1.docker.io',
+      repository: 'library/nginx',
+      operation: 'manifests',
+      reference: 'latest',
+      registryConfig: REGISTRY_CONFIG.get('registry-1.docker.io')!
+    }
   },
   {
-    input: '/v2/someuser/somerepo/manifests/latest',
-    expected: '/v2/someuser/somerepo/manifests/latest'
+    input: '/v2/alpine/blobs/sha256:abc123',
+    expected: {
+      registry: 'registry-1.docker.io',
+      repository: 'library/alpine',
+      operation: 'blobs',
+      reference: 'sha256:abc123',
+      registryConfig: REGISTRY_CONFIG.get('registry-1.docker.io')!
+    }
+  },
+  // ===== DockerHub =====
+  {
+    input: '/v2/library/ubuntu/manifests/22.04',
+    expected: {
+      registry: 'registry-1.docker.io',
+      repository: 'library/ubuntu',
+      operation: 'manifests',
+      reference: '22.04',
+      registryConfig: REGISTRY_CONFIG.get('registry-1.docker.io')!
+    }
   },
   {
-    input: '/v2/redis/blobs/sha256:abcd1234',
-    expected: '/v2/library/redis/blobs/sha256:abcd1234'
+    input: '/v2/user/myapp/blobs/sha256:def456',
+    expected: {
+      registry: 'registry-1.docker.io',
+      repository: 'user/myapp',
+      operation: 'blobs',
+      reference: 'sha256:def456',
+      registryConfig: REGISTRY_CONFIG.get('registry-1.docker.io')!
+    }
   },
+
+  // ===== GHCR =====
   {
     input: '/v2/ghcr.io/linuxserver/nginx/manifests/latest',
-    expected: '/v2/linuxserver/nginx/manifests/latest'
+    expected: {
+      registry: 'ghcr.io',
+      repository: 'linuxserver/nginx',
+      operation: 'manifests',
+      reference: 'latest',
+      registryConfig: REGISTRY_CONFIG.get('ghcr.io')!
+    }
   },
   {
-    input: '/v2/ghcr.io/myusername/myapp/manifests/latest',
-    expected: '/v2/myusername/myapp/manifests/latest'
-  },
-  {
-    input: '/v2/gcr.io/distroless/static-debian12/manifests/nonroot',
-    expected: '/v2/distroless/static-debian12/manifests/nonroot'
+    input: '/v2/ghcr.io/myusername/myapp/blobs/sha256:1234',
+    expected: {
+      registry: 'ghcr.io',
+      repository: 'myusername/myapp',
+      operation: 'blobs',
+      reference: 'sha256:1234',
+      registryConfig: REGISTRY_CONFIG.get('ghcr.io')!
+    }
   }
 ];
 
-test('rewritePath function', () => {
-  for (const c of cases) {
-    const result = rewritePath(c.input);
-    expect(result).toBe(c.expected);
+test('ParsePath function', () => {
+  for (const c of parseCases) {
+    const result = ParsePath(c.input);
+    expect(result).toEqual(c.expected);
   }
 });
