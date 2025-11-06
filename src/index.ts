@@ -8,13 +8,32 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 // 工具函数:将裸镜像名(如 nginx)重写为 library/nginx
 export function rewritePath(path: string): string {
-  if (path.startsWith('/v2/library/')) return path;
+  if (!path.startsWith('/v2/')) return path;
 
-  const parts = path.split('/');
-  if (parts.length !== 5) return path;
-  if (parts[3] !== 'manifests' && parts[3] !== 'blobs') return path;
+  const parts = path.split('/').filter((p) => p !== '');
+  // 至少需要: v2, ..., manifests|blobs, <ref>
+  if (parts.length < 4 || parts[0] !== 'v2') return path;
 
-  return `/v2/library/${parts[2]}/${parts[3]}/${parts[4]}`;
+  const operationIndex = parts.length - 2;
+  const operation = parts[operationIndex];
+  if (operation !== 'manifests' && operation !== 'blobs') return path;
+
+  // 检查是否以已知 registry 域名开头（第1个路径段）
+  const knownRegistries = new Set(['ghcr.io', 'gcr.io', 'quay.io', 'registry-1.docker.io', 'docker.io']);
+
+  const firstSegment = parts[1];
+  if (knownRegistries.has(firstSegment)) {
+    const repoAndRest = parts.slice(2).join('/');
+    return `/v2/${repoAndRest}`;
+  }
+
+  const repoParts = parts.slice(1, operationIndex);
+  const repoName = repoParts.join('/');
+  if (repoParts.length === 1) {
+    const ref = parts[parts.length - 1];
+    return `/v2/library/${repoName}/${operation}/${ref}`;
+  }
+  return path;
 }
 app.get('/v2/*', async (c) => {
   const path = new URL(c.req.url).pathname;
