@@ -155,7 +155,7 @@ app.get('/v2/*', async (c) => {
       return new Response('Auth failed', { status: tokenRes.status });
     }
 
-    const tokenData = await tokenRes.json();
+    const tokenData = (await tokenRes.json()) as { token?: string; access_token?: string };
     const token = tokenData.token || tokenData.access_token;
     if (!token) {
       return new Response('Invalid token response', { status: 502 });
