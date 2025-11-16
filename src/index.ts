@@ -1,10 +1,6 @@
 import { Hono } from 'hono';
-type Bindings = {
-  DOCKER_USERNAME: string;
-  DOCKER_TOKEN: string;
-  GITHUB_USERNAME: string;
-  GITHUB_TOKEN: string;
-};
+import { env } from 'hono/adapter';
+
 export type RegistryConfig = {
   backend: string;
   auth: string;
@@ -33,7 +29,7 @@ export const REGISTRY_CONFIG = new Map<string, RegistryConfig>([
     }
   ]
 ]);
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono();
 const KNOWN_REGISTRIES = new Set(['ghcr.io', 'gcr.io', 'quay.io', 'registry-1.docker.io', 'docker.io']);
 
 export function ParsePath(path: string): ParsePathResult | null {
@@ -83,6 +79,18 @@ export function ParsePath(path: string): ParsePathResult | null {
 }
 
 app.get('/v2/*', async (c) => {
+  const { DOCKER_USERNAME } = env<{ DOCKER_USERNAME: string }>(c);
+  if (!DOCKER_USERNAME) {
+    console.warn('DOCKER_USERNAME is not set');
+  }
+  const { DOCKER_TOKEN } = env<{ DOCKER_TOKEN: string }>(c);
+  if (!DOCKER_TOKEN) {
+    console.warn('DOCKER_TOKEN is not set');
+  }
+  const { GITHUB_USERNAME } = env<{ GITHUB_USERNAME: string }>(c);
+
+  const { GITHUB_TOKEN } = env<{ GITHUB_TOKEN: string }>(c);
+
   const path = new URL(c.req.url).pathname;
   let header = c.req.header();
   const config = ParsePath(path);
@@ -123,10 +131,10 @@ app.get('/v2/*', async (c) => {
     let authHeader: string;
     switch (registry) {
       case 'registry-1.docker.io':
-        authHeader = 'Basic ' + btoa(`${c.env.DOCKER_USERNAME}:${c.env.DOCKER_TOKEN}`);
+        authHeader = 'Basic ' + btoa(`${DOCKER_USERNAME}:${DOCKER_TOKEN}`);
         break;
       case 'ghcr.io':
-        authHeader = 'Basic ' + btoa(`${c.env.GITHUB_USERNAME}:${c.env.GITHUB_TOKEN}`);
+        authHeader = 'Basic ' + btoa(`${GITHUB_USERNAME}:${GITHUB_TOKEN}`);
         break;
       default:
         return new Response('Registry not supported for auth', { status: 501 });
