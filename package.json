@@ -9,12 +9,12 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
-    "hono": "^4.10.4"
+    "hono": "^4.12.8"
   },
   "devDependencies": {
-    "tsdown": "^0.16.4",
+    "tsdown": "^0.21.4",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.9",
-    "wrangler": "^4.45"
+    "vitest": "^4.1.0",
+    "wrangler": "^4.76.0"
   }
 }
