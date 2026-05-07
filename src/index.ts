@@ -5,11 +5,11 @@ import { parseRegistryPath, parseWwwAuthenticate, fetchRegistryToken } from './u
 const app = new Hono();
 
 app.get('/v2/*', async (c) => {
-  const { DOCKER_USERNAME, DOCKER_TOKEN, GITHUB_USERNAME, GITHUB_TOKEN } = env<{
+  const { DOCKER_USERNAME, DOCKER_TOKEN, GHCR_USERNAME, GHCR_TOKEN } = env<{
     DOCKER_USERNAME?: string;
     DOCKER_TOKEN?: string;
-    GITHUB_USERNAME?: string;
-    GITHUB_TOKEN?: string;
+    GHCR_USERNAME?: string;
+    GHCR_TOKEN?: string;
   }>(c);
 
   const path = new URL(c.req.url).pathname;
@@ -35,8 +35,8 @@ app.get('/v2/*', async (c) => {
       return new Response('Unauthorized - Invalid WWW-Authenticate', { status: 401 });
     }
 
-    let targetUser = registry === 'ghcr.io' ? GITHUB_USERNAME : DOCKER_USERNAME;
-    let targetToken = registry === 'ghcr.io' ? GITHUB_TOKEN : DOCKER_TOKEN;
+    let targetUser = registry === 'ghcr.io' ? GHCR_USERNAME : DOCKER_USERNAME;
+    let targetToken = registry === 'ghcr.io' ? GHCR_TOKEN : DOCKER_TOKEN;
 
     const token = await fetchRegistryToken(
       registryConfig.auth,
