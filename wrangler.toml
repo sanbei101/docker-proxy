@@ -1,6 +1,6 @@
 name = "docker-proxy"
 main = "src/index.ts"
-compatibility_date = "2026-02-24"
+compatibility_date = "2026-04-21"
 
 [observability.logs]
 enabled = true

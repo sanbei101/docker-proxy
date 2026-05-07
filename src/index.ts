@@ -30,7 +30,7 @@ export const REGISTRY_CONFIG = new Map<string, RegistryConfig>([
   ]
 ]);
 const app = new Hono();
-const KNOWN_REGISTRIES = new Set(['ghcr.io', 'gcr.io', 'quay.io', 'registry-1.docker.io', 'docker.io']);
+const KNOWN_REGISTRIES = new Set(['ghcr.io', 'registry-1.docker.io', 'docker.io']);
 
 export function ParsePath(path: string): ParsePathResult | null {
   if (!path.startsWith('/v2/')) return null;
