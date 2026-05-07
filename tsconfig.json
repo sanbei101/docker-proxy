@@ -9,5 +9,8 @@
       "ESNext",
       "DOM"
     ],
+    "types": [
+      "node",
+    ],
   },
 }
