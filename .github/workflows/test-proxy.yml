@@ -41,7 +41,7 @@ jobs:
       - name: Docker Pull Test
         run: |
           docker pull localhost:8787/alpine:latest
-          docker pull localhost:8787/ghcr.io/linuxsuren/alpine:latest
+          docker pull localhost:8787/ghcr.io/linuxcontainers/alpine:latest
 
       - name: see logs
         if: always()
