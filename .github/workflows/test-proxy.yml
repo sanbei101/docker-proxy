@@ -44,6 +44,7 @@ jobs:
           docker pull localhost:8787/ghcr.io/linuxsuren/alpine:latest
 
       - name: see logs
+        if: always()
         run: cat /tmp/hono.log
 
       - name: Cleanup
