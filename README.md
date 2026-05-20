@@ -20,18 +20,18 @@ GHCR_USERNAME / GHCR_TOKEN
 
 ## 📖 使用教程
 
-假设你部署后的代理服务域名为: `proxy.sanbei.codes`
+假设你部署后的代理服务域名为: `docker.sanbei.codes`
 
 场景 1:拉取 Docker Hub镜像
 
 ```
-docker pull proxy.sanbei.codes/nginx:latest
+docker pull docker.sanbei.codes/nginx:latest
 ```
 
 场景2: 拉取 GHCR镜像
 
 ```
-docker pull proxy.sanbei.codes/ghcr.io/sanbei101/im:latest
+docker pull docker.sanbei.codes/ghcr.io/sanbei101/im:latest
 ```
 
 ## 🧱 源码结构与原理说明
