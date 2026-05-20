@@ -2,9 +2,9 @@ name: 测试 Docker Proxy
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
 
 jobs:
   test:
@@ -17,7 +17,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
-          version: 10
+          version: latest
           cache: true
 
       - name: Setup Node.js
@@ -29,31 +29,10 @@ jobs:
       - name: 📥 Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: RUN wrangler dev in background
-        run: |
-          nohup pnpm run dev > /tmp/hono.log 2>&1 &
-          echo $! > /tmp/hono.pid
-          echo "Waiting for Wrangler server to start on port 8787..."
-          npx wait-on http://127.0.0.1:8787 -t 5000 || (cat /tmp/hono.log && exit 1)
-          echo "Server is up!"
+      - name: 🚀 Proxy 测试
+        run: pnpm run test
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Docker Pull Test
-        run: |
-          docker pull localhost:8787/alpine:latest
-          docker pull localhost:8787/ghcr.io/linuxcontainers/alpine:latest
-
-      - name: see logs
-        if: always()
-        run: cat /tmp/hono.log
-
-      - name: Cleanup
-        run: |
-          if [ -f /tmp/hono.pid ]; then
-            kill $(cat /tmp/hono.pid) || true
-            rm /tmp/hono.pid
-          fi

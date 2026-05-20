@@ -6,7 +6,6 @@
     "deploy": "wrangler deploy --minify",
     "fmt": "oxfmt",
     "test": "vitest run",
-    "test:ci": "vitest run --reporter=verbose",
     "build": "tsdown",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
@@ -14,6 +13,7 @@
     "hono": "^4.12.21"
   },
   "devDependencies": {
+    "@hono/node-server": "^2.0.3",
     "@types/node": "^24",
     "oxfmt": "^0.51.0",
     "tsdown": "^0.22.0",
