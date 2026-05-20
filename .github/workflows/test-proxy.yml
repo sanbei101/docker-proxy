@@ -27,7 +27,7 @@ jobs:
           cache: 'pnpm'
 
       - name: 📥 Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --config.minimumReleaseAge=0
 
       - name: 🚀 Proxy 测试
         run: pnpm run test
