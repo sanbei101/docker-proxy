@@ -39,7 +39,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
     const { stdout } = await exec(`docker pull ${PROXY_URL}/alpine:latest`);
 
     expect(stdout).toContain('Status:');
-    console.log('✅ Docker Hub 镜像真实拉取成功！');
+    console.log('✅ Docker Hub 镜像真实拉取成功!');
   }, 10 * 1000);
 
   it('应该能通过代理成功 pull GHCR 的镜像', async () => {
@@ -50,6 +50,6 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
     const { stdout } = await exec(`docker pull ${PROXY_URL}/ghcr.io/linuxcontainers/alpine:latest`);
 
     expect(stdout).toContain('Status:');
-    console.log('✅ GHCR 镜像真实拉取成功！');
+    console.log('✅ GHCR 镜像真实拉取成功!');
   }, 10 * 1000);
 });
