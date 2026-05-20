@@ -56,7 +56,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
       }
       expect(stdout).toContain('Status:');
       expect(stdout).toContain('Digest:');
-      expect(stderr).toBeNull();
+      expect(stderr).toBe("");
       console.log('✅ Docker Hub 镜像真实拉取成功!');
     },
     10 * 1000,
@@ -82,7 +82,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
       }
       expect(stdout).toContain('Status:');
       expect(stdout).toContain('Digest:');
-      expect(stderr).toBeNull();
+      expect(stderr).toBe("");
       console.log('✅ GHCR 镜像真实拉取成功!');
     },
     10 * 1000,
