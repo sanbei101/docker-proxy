@@ -37,7 +37,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
   it('应该能通过代理成功 pull 官方 Docker Hub 的 alpine 镜像', () => {
     console.log('正在执行: docker pull alpine...');
 
-    execSync(`docker rmi ${PROXY_URL}/alpine:latest`, { stdio: 'ignore' });
+    execSync(`docker rmi -f ${PROXY_URL}/alpine:latest`, { stdio: 'ignore' });
 
     const output = execSync(`docker pull ${PROXY_URL}/alpine:latest`, {
       encoding: 'utf8',
@@ -50,7 +50,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
   it('应该能通过代理成功 pull GHCR 的镜像', () => {
     console.log('正在执行: docker pull linuxcontainers/alpine...');
 
-    execSync(`docker rmi ${PROXY_URL}/ghcr.io/linuxcontainers/alpine:latest`, {
+    execSync(`docker rmi -f ${PROXY_URL}/ghcr.io/linuxcontainers/alpine:latest`, {
       stdio: 'ignore',
     });
 
