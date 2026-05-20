@@ -34,7 +34,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
   afterAll(() => {
     if (server) {
       server.close();
-      console.log('\n🛑 测试中转服务器已关闭');
+      console.log('\n测试中转服务器已关闭');
     }
   });
 
@@ -45,7 +45,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
 
       try {
         await exec(`docker rmi -f ${PROXY_URL}/alpine:latest`);
-      } catch {}
+      } catch { }
 
       const { stdout, stderr } = await exec(
         `docker pull ${PROXY_URL}/alpine:latest`,
@@ -56,6 +56,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
       }
       expect(stdout).toContain('Status:');
       expect(stdout).toContain('Digest:');
+      expect(stderr).toBeNull();
       console.log('✅ Docker Hub 镜像真实拉取成功!');
     },
     10 * 1000,
@@ -70,17 +71,18 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
         await exec(
           `docker rmi -f ${PROXY_URL}/ghcr.io/linuxcontainers/alpine:latest`,
         );
-      } catch {}
+      } catch { }
 
       const { stdout, stderr } = await exec(
         `docker pull ${PROXY_URL}/ghcr.io/linuxcontainers/alpine:latest`,
       );
-
+      console.log('Docker Pull 输出:', stdout);
       if (stderr) {
         console.error('Docker Pull 错误:', stderr);
       }
       expect(stdout).toContain('Status:');
       expect(stdout).toContain('Digest:');
+      expect(stderr).toBeNull();
       console.log('✅ GHCR 镜像真实拉取成功!');
     },
     10 * 1000,
