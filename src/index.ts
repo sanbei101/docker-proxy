@@ -1,7 +1,11 @@
 import { Hono } from 'hono';
 import { env } from 'hono/adapter';
 
-import { parseRegistryPath, parseWwwAuthenticate, fetchRegistryToken } from './utils';
+import {
+  parseRegistryPath,
+  parseWwwAuthenticate,
+  fetchRegistryToken,
+} from './utils';
 
 const app = new Hono();
 
@@ -14,14 +18,21 @@ app.get('/v2/*', async (c) => {
   }>(c);
 
   const path = new URL(c.req.url).pathname;
-  const config = parseRegistryPath(path);
+  const dockerProxyRequest = parseRegistryPath(path);
 
-  if (!config) {
+  if (!dockerProxyRequest) {
     return new Response('Invalid path', { status: 400 });
   }
 
-  const { registry, repository, operation, reference, registryConfig } = config;
-  const backendUrl = `${registryConfig.backend}/v2/${repository}/${operation}/${reference}`;
+  const {
+    registryHost,
+    repository,
+    resourceType,
+    tagOrDigest,
+    upstreamConfig,
+  } = dockerProxyRequest;
+
+  const backendUrl = `${upstreamConfig.backend}/v2/${repository}/${resourceType}/${tagOrDigest}`;
 
   console.log(`Proxying: ${path} → ${backendUrl}`);
 
@@ -33,14 +44,17 @@ app.get('/v2/*', async (c) => {
     const authParams = parseWwwAuthenticate(wwwAuth);
 
     if (!authParams) {
-      return new Response('Unauthorized - Invalid WWW-Authenticate', { status: 401 });
+      return new Response('Unauthorized - Invalid WWW-Authenticate', {
+        status: 401,
+      });
     }
 
-    let targetUser = registry === 'ghcr.io' ? GHCR_USERNAME : DOCKER_USERNAME;
-    let targetToken = registry === 'ghcr.io' ? GHCR_TOKEN : DOCKER_TOKEN;
+    let targetUser =
+      registryHost === 'ghcr.io' ? GHCR_USERNAME : DOCKER_USERNAME;
+    let targetToken = registryHost === 'ghcr.io' ? GHCR_TOKEN : DOCKER_TOKEN;
 
     const token = await fetchRegistryToken(
-      registryConfig.auth,
+      upstreamConfig.auth,
       authParams.service,
       authParams.scope,
       targetUser,

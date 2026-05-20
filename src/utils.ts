@@ -10,46 +10,55 @@ export type ParsePathResult = {
 
 export type DockerProxyRequest = {
   registryHost: string; // 例如: 'registry-1.docker.io'
-  repository: string; // 例如: 'library/ubuntu' 或 'owner/repo'
+  repository: string; // 例如: 'library/ubuntu'
   resourceType: 'manifests' | 'blobs';
   tagOrDigest: string; // 标签或哈希值
   upstreamConfig: RegistryConfig; // 上游配置
 };
 
-export function parseRegistryPath(path: string): ParsePathResult | null {
+export function parseRegistryPath(path: string): DockerProxyRequest | null {
   if (!path.startsWith('/v2/')) return null;
 
   const parts = path.split('/').filter(Boolean);
   if (parts.length < 4 || parts[0] !== 'v2') return null;
 
-  const operationIndex = parts.length - 2;
-  const operation = parts[operationIndex] as 'manifests' | 'blobs';
-  if (operation !== 'manifests' && operation !== 'blobs') return null;
+  const resourceTypeIndex = parts.length - 2;
+  const resourceType = parts[resourceTypeIndex] as 'manifests' | 'blobs';
+  if (resourceType !== 'manifests' && resourceType !== 'blobs') return null;
 
-  const reference = parts[parts.length - 1];
+  const tagOrDigest = parts[parts.length - 1];
   const firstSegment = parts[1];
 
   let registryKey = 'registry-1.docker.io';
   let repoStartIndex = 1;
 
   if (KNOWN_REGISTRIES.has(firstSegment)) {
-    registryKey = firstSegment === 'docker.io' ? 'registry-1.docker.io' : firstSegment;
+    registryKey =
+      firstSegment === 'docker.io' ? 'registry-1.docker.io' : firstSegment;
     repoStartIndex = 2;
   }
 
-  const config = REGISTRY_CONFIG.get(registryKey);
-  if (!config) return null;
+  const upstreamConfig = REGISTRY_CONFIG.get(registryKey);
+  if (!upstreamConfig) return null;
 
-  const repoParts = parts.slice(repoStartIndex, operationIndex);
+  const repoParts = parts.slice(repoStartIndex, resourceTypeIndex);
   const repository =
     registryKey === 'registry-1.docker.io' && repoParts.length === 1
       ? `library/${repoParts[0]}`
       : repoParts.join('/');
 
-  return { registry: registryKey, repository, operation, reference, registryConfig: config };
+  return {
+    registryHost: registryKey,
+    repository,
+    resourceType,
+    tagOrDigest,
+    upstreamConfig,
+  };
 }
 
-export function parseWwwAuthenticate(header: string): { service: string; scope: string } | null {
+export function parseWwwAuthenticate(
+  header: string,
+): { service: string; scope: string } | null {
   if (!header || !header.startsWith('Bearer ')) return null;
 
   const params = new Map<string, string>();
@@ -85,11 +94,18 @@ export async function fetchRegistryToken(
   try {
     const tokenRes = await fetch(tokenUrl, fetchOptions);
     if (!tokenRes.ok) {
-      console.error('Token fetch failed:', tokenRes.status, await tokenRes.text());
+      console.error(
+        'Token fetch failed:',
+        tokenRes.status,
+        await tokenRes.text(),
+      );
       return null;
     }
 
-    const data = (await tokenRes.json()) as { token?: string; access_token?: string };
+    const data = (await tokenRes.json()) as {
+      token?: string;
+      access_token?: string;
+    };
     return data.token || data.access_token || null;
   } catch (error) {
     console.error('Error fetching token:', error);

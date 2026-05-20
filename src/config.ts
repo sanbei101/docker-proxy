@@ -20,4 +20,8 @@ export const REGISTRY_CONFIG = new Map<string, RegistryConfig>([
   ],
 ]);
 
-export const KNOWN_REGISTRIES = new Set(['ghcr.io', 'registry-1.docker.io', 'docker.io']);
+export const KNOWN_REGISTRIES = new Set([
+  'ghcr.io',
+  'registry-1.docker.io',
+  'docker.io',
+]);
