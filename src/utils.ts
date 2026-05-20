@@ -8,6 +8,14 @@ export type ParsePathResult = {
   registryConfig: RegistryConfig;
 };
 
+export type DockerProxyRequest = {
+  registryHost: string; // 例如: 'registry-1.docker.io'
+  repository: string; // 例如: 'library/ubuntu' 或 'owner/repo'
+  resourceType: 'manifests' | 'blobs';
+  tagOrDigest: string; // 标签或哈希值
+  upstreamConfig: RegistryConfig; // 上游配置
+};
+
 export function parseRegistryPath(path: string): ParsePathResult | null {
   if (!path.startsWith('/v2/')) return null;
 
@@ -20,7 +28,7 @@ export function parseRegistryPath(path: string): ParsePathResult | null {
 
   const reference = parts[parts.length - 1];
   const firstSegment = parts[1];
-  
+
   let registryKey = 'registry-1.docker.io';
   let repoStartIndex = 1;
 
@@ -33,9 +41,10 @@ export function parseRegistryPath(path: string): ParsePathResult | null {
   if (!config) return null;
 
   const repoParts = parts.slice(repoStartIndex, operationIndex);
-  const repository = (registryKey === 'registry-1.docker.io' && repoParts.length === 1)
-    ? `library/${repoParts[0]}`
-    : repoParts.join('/');
+  const repository =
+    registryKey === 'registry-1.docker.io' && repoParts.length === 1
+      ? `library/${repoParts[0]}`
+      : repoParts.join('/');
 
   return { registry: registryKey, repository, operation, reference, registryConfig: config };
 }
@@ -61,7 +70,7 @@ export async function fetchRegistryToken(
   service: string,
   scope: string,
   username?: string,
-  token?: string
+  token?: string,
 ): Promise<string | null> {
   const queryParams = new URLSearchParams({ service, scope });
   const tokenUrl = `${authUrl}?${queryParams.toString()}`;

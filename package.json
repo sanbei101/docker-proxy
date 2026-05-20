@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
+    "fmt": "oxfmt",
     "test": "vitest run",
     "test:ci": "vitest run --reporter=verbose",
     "build": "tsdown",
@@ -14,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^24",
+    "oxfmt": "^0.51.0",
     "tsdown": "^0.22.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6",

@@ -6,5 +6,5 @@ export default defineConfig({
   format: ['esm'],
   dts: true,
   minify: true,
-  treeshake: true
+  treeshake: true,
 });

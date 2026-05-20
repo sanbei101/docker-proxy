@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { env } from 'hono/adapter';
+
 import { parseRegistryPath, parseWwwAuthenticate, fetchRegistryToken } from './utils';
 
 const app = new Hono();
@@ -21,7 +22,7 @@ app.get('/v2/*', async (c) => {
 
   const { registry, repository, operation, reference, registryConfig } = config;
   const backendUrl = `${registryConfig.backend}/v2/${repository}/${operation}/${reference}`;
-  
+
   console.log(`Proxying: ${path} → ${backendUrl}`);
 
   let reqHeaders = new Headers(c.req.header());
@@ -30,7 +31,7 @@ app.get('/v2/*', async (c) => {
   if (res.status === 401) {
     const wwwAuth = res.headers.get('www-authenticate') || '';
     const authParams = parseWwwAuthenticate(wwwAuth);
-    
+
     if (!authParams) {
       return new Response('Unauthorized - Invalid WWW-Authenticate', { status: 401 });
     }
@@ -43,7 +44,7 @@ app.get('/v2/*', async (c) => {
       authParams.service,
       authParams.scope,
       targetUser,
-      targetToken
+      targetToken,
     );
 
     if (!token) {
@@ -56,7 +57,7 @@ app.get('/v2/*', async (c) => {
   return new Response(res.body, {
     status: res.status,
     statusText: res.statusText,
-    headers: res.headers
+    headers: res.headers,
   });
 });
 
