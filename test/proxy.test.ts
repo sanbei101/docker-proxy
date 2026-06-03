@@ -59,7 +59,7 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
       expect(stderr).toBe("");
       console.log('✅ Docker Hub 镜像真实拉取成功!');
     },
-    10 * 1000,
+    20 * 1000,
   );
 
   it(
@@ -85,6 +85,6 @@ describe('Docker Proxy 真实 Docker Pull 终端集成测试', () => {
       expect(stderr).toBe("");
       console.log('✅ GHCR 镜像真实拉取成功!');
     },
-    10 * 1000,
+    20 * 1000,
   );
 });
