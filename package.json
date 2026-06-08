@@ -12,7 +12,7 @@
   "devDependencies": {
     "@hono/node-server": "^2.0.4",
     "@types/node": "^25.9.2",
-    "oxfmt": "^0.51.0",
+    "oxfmt": "^0.53.0",
     "rolldown": "^1.1.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
