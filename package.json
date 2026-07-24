@@ -7,10 +7,10 @@
     "build": "rolldown -c rolldown.config.ts"
   },
   "dependencies": {
-    "hono": "^4.12.25"
+    "hono": "^4.12.27"
   },
   "devDependencies": {
-    "@hono/node-server": "^2.0.5",
+    "@hono/node-server": "^2.0.10",
     "@types/node": "^25.9.3",
     "oxfmt": "^0.55.0",
     "rolldown": "^1.1.1",
