@@ -7,7 +7,7 @@
     "build": "rolldown -c rolldown.config.ts"
   },
   "dependencies": {
-    "hono": "^4.12.27"
+    "hono": "^4.12.31"
   },
   "devDependencies": {
     "@hono/node-server": "^2.0.10",
