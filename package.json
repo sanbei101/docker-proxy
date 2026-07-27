@@ -15,6 +15,6 @@
     "oxfmt": "^0.60.0",
     "rolldown": "^1.2.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }
