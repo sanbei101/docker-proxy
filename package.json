@@ -13,7 +13,7 @@
     "@hono/node-server": "^2.1.1",
     "@types/node": "^26.5.0",
     "oxfmt": "^0.67.0",
-    "rolldown": "^1.2.7",
+    "rolldown": "^1.2.8",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"
   }
