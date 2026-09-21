@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@hono/node-server": "^2.1.1",
-    "@types/node": "^26.6.1",
+    "@types/node": "^26.6.2",
     "oxfmt": "^0.68.0",
     "rolldown": "^1.2.9",
     "typescript": "^7.0.2",
