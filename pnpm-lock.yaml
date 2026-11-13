@@ -9,12 +9,12 @@ importers:
   .:
     dependencies:
       hono:
-        specifier: ^4.13.17
-        version: 4.13.17
+        specifier: ^4.13.18
+        version: 4.13.18
     devDependencies:
       '@hono/node-server':
         specifier: ^2.1.6
-        version: 2.1.6(hono@4.13.17)
+        version: 2.1.6(hono@4.13.18)
       '@types/node':
         specifier: ^26.6.6
         version: 26.6.6
@@ -739,8 +739,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  hono@4.13.17:
-    resolution: {integrity: sha512-vZIcbkvjOR5hHRWERbGkr8fGfF0GGM1ooYkuH448iO3b2AdVEr3AXZSw4Z3Kn+1L5z0CVoVeyV29VGYmFh05kQ==}
+  hono@4.13.18:
+    resolution: {integrity: sha512-H9q/E1XizaWstJxUW881dmLxEj+t/TrGGnyxINkm4+sK0qUwsMtFdo2BWI9Vs3cIS19MU6b6iCijoUoEf4f3DA==}
     engines: {node: '>=16.9.0'}
 
   lightningcss-android-arm64@1.33.0:
@@ -1085,9 +1085,9 @@ snapshots:
   '@esbuild/win32-x64@0.27.3':
     optional: true
 
-  '@hono/node-server@2.1.6(hono@4.13.17)':
+  '@hono/node-server@2.1.6(hono@4.13.18)':
     dependencies:
-      hono: 4.13.17
+      hono: 4.13.18
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
@@ -1405,7 +1405,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  hono@4.13.17: {}
+  hono@4.13.18: {}
 
   lightningcss-android-arm64@1.33.0:
     optional: true
